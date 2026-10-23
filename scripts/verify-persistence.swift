@@ -32,7 +32,8 @@ struct VerifyPersistence {
         try secondContext.save()
         let third = try ModelContainer(for: Person.self, ProfileExtras.self, migrationPlan: RememberMigrationPlan.self, configurations: configuration)
         let thirdContext = ModelContext(third)
-        precondition(try thirdContext.fetch(FetchDescriptor<ProfileExtras>()).first?.favoriteColors == "Blue")
+        let reopenedExtras = try thirdContext.fetch(FetchDescriptor<ProfileExtras>())
+        precondition(reopenedExtras.first?.favoriteColors == "Blue")
         print("Persistence and V1-to-V2 migration verification passed")
     }
 }
