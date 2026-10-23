@@ -12,3 +12,4 @@ xcrun simctl install "$DEVICE_ID" "$APP_PATH"
 xcrun simctl launch "$DEVICE_ID" com.diegoscarpa.Remember
 sleep 3
 xcrun simctl io "$DEVICE_ID" screenshot "$RUNNER_TEMP/remember-home.png"
+echo "SIMULATOR_UDID=$DEVICE_ID" >> "$GITHUB_ENV"

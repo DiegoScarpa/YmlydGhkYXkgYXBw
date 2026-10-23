@@ -17,6 +17,9 @@ jobs:
           "$RUNNER_TEMP/verify-persistence" "$RUNNER_TEMP/RememberVerification.store"
       - name: Launch app in iPhone simulator
         run: bash scripts/smoke-simulator.sh
+      - name: Test adding Sarah and relaunching
+        timeout-minutes: 12
+        run: xcodebuild -project Remember.xcodeproj -scheme Remember -configuration Debug -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
       - name: Save launch screenshot
         if: success()
         uses: actions/upload-artifact@v4

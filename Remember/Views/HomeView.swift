@@ -13,18 +13,26 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     header
                     if people.isEmpty {
-                        ContentUnavailableView {
-                            Label("Remember Someone Special", systemImage: "heart.text.square")
-                        } description: {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Image(systemName: "heart.text.square")
+                                .font(.title)
+                                .foregroundStyle(Color.accentColor)
+                            Text("Remember someone special")
+                                .font(.title3.bold())
                             Text("Add a person to see birthdays and the details that matter to them.")
-                        } actions: {
-                            Button("Add Person", action: onAdd).buttonStyle(.borderedProminent)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Button("Add Person", action: onAdd)
+                                .buttonStyle(.borderedProminent)
+                                .accessibilityIdentifier("home.addPerson")
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(20)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 18))
                     } else {
                         birthdaySection("Today", systemImage: "sparkles", people: inRange(0...0))
                         birthdaySection("Next 7 Days", systemImage: "sun.max", people: inRange(1...7))
                         birthdaySection("Coming Up", systemImage: "gift", people: inRange(8...30))
-                        calendarPreview
                         Button {
                             selection = .people
                         } label: {
@@ -33,6 +41,7 @@ struct HomeView: View {
                         }
                         .buttonStyle(.bordered)
                     }
+                    calendarPreview
                 }
                 .padding(20)
             }

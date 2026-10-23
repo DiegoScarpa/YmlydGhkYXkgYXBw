@@ -36,7 +36,16 @@ enum CommunicationLinks {
     }
 
     static func website(_ value: String) -> URL? {
-        social(value, base: "https://")
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        if let url = URL(string: trimmed),
+           ["http", "https"].contains(url.scheme?.lowercased() ?? ""),
+           url.host != nil {
+            return url
+        }
+        guard !trimmed.contains(where: \.isWhitespace), trimmed.contains("."),
+              let url = URL(string: "https://" + trimmed), url.host != nil else { return nil }
+        return url
     }
 
     private static func social(_ value: String, base: String) -> URL? {

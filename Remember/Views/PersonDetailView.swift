@@ -228,7 +228,13 @@ struct PersonDetailView: View {
         VStack(alignment: .leading, spacing: 13) {
             Text("More to remember").font(.title3.bold())
             ForEach(extras.customFields) { field in
-                detailRow(field.title, value: field.value, icon: "square.text.square")
+                if let url = CommunicationLinks.website(field.value) {
+                    Link(destination: url) {
+                        detailRow(field.title, value: field.value, icon: "link")
+                    }
+                } else {
+                    detailRow(field.title, value: field.value, icon: "square.text.square")
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

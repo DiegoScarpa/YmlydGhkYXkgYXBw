@@ -11,6 +11,7 @@ Remember is a local-first iPhone app for birthdays and the details that help you
 | `Remember/Components` | Reusable avatars, birthday rows, and calendar grid |
 | `Remember/Views` | Four tabs, profile details, and the profile editor |
 | `RememberTests` | Unit tests for birthdays and reminder planning |
+| `RememberUITests` | iPhone interface test for adding Sarah, relaunching, and finding her on the calendar |
 
 The dashboard, calendar, and reminder scheduler use the same `BirthdayCalculator`. A February 29 birthday is observed on February 28 in years without February 29. The app has one local SwiftData store and no server or account dependency.
 
@@ -23,7 +24,7 @@ The dashboard, calendar, and reminder scheduler use the same `BirthdayCalculator
 5. In Settings, enable birthday reminders and grant notification permission. Select offsets and a delivery time.
 6. Optionally choose contacts in **Import from Contacts** or save a JSON copy with **Export All Data**.
 
-For the core unit tests, run `swift test` on a Mac with Xcode installed. The CI workflow builds the simulator app, runs those tests, and checks that a SwiftData profile survives reopening its store. `scripts/verify-core.swift` is a lightweight assertion harness for environments with Swift but no XCTest.
+For the core unit tests, run `swift test` on a Mac with Xcode installed. The shared Xcode scheme runs the interface test on an iPhone simulator. CI builds the app, runs both test suites, checks that a SwiftData profile survives migration and reopening, and captures a launch screenshot. `scripts/verify-core.swift` is a lightweight assertion harness for environments with Swift but no XCTest.
 
 ## Phase 1 behavior
 
