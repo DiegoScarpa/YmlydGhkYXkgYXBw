@@ -40,4 +40,4 @@ This is the Phase 1 scope. Profile photos, Contacts import, gift management, cus
 
 Reminder requests are regenerated on launch and after relevant edits. The planner keeps the nearest 60 pending requests to stay below iOS's pending notification limit. With many people or offsets, later reminders require opening the app again to replenish the queue. Notifications depend on iOS authorization and delivery behavior. The app stores data in its iOS sandbox; SwiftData does not itself provide end-to-end encryption or cross-device sync. The app does not request Contacts access or transmit profile data.
 
-SwiftData can migrate compatible additive model changes automatically. Any future incompatible schema change should add an explicit versioned schema and migration plan before release.
+The SwiftData store starts with `RememberSchemaV1` and an explicit migration plan. A future model change should add a new schema version and migration stage when needed.

@@ -8,7 +8,7 @@ struct RememberApp: App {
 
     init() {
         do {
-            container = try ModelContainer(for: Person.self)
+            container = try ModelContainer(for: Person.self, migrationPlan: RememberMigrationPlan.self)
             storageError = nil
         } catch {
             container = nil

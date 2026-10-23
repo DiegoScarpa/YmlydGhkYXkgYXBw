@@ -180,10 +180,12 @@ struct PersonDetailView: View {
         do {
             modelContext.delete(person)
             try modelContext.save()
-            let allPeople = try modelContext.fetch(FetchDescriptor<Person>())
-            Task { try? await NotificationCoordinator.shared.refresh(people: allPeople) }
+            if let allPeople = try? modelContext.fetch(FetchDescriptor<Person>()) {
+                Task { try? await NotificationCoordinator.shared.refresh(people: allPeople) }
+            }
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = error.localizedDescription
             showingError = true
         }

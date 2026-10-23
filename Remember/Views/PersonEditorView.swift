@@ -192,10 +192,12 @@ struct PersonEditorView: View {
             draft.apply(to: target)
             if person == nil { modelContext.insert(target) }
             try modelContext.save()
-            let allPeople = try modelContext.fetch(FetchDescriptor<Person>())
-            Task { try? await NotificationCoordinator.shared.refresh(people: allPeople) }
+            if let allPeople = try? modelContext.fetch(FetchDescriptor<Person>()) {
+                Task { try? await NotificationCoordinator.shared.refresh(people: allPeople) }
+            }
             dismiss()
         } catch {
+            modelContext.rollback()
             showError(error.localizedDescription)
         }
     }

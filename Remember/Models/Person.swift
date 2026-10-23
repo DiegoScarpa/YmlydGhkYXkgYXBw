@@ -107,3 +107,13 @@ final class Person {
             .joined(separator: " ")
     }
 }
+
+enum RememberSchemaV1: VersionedSchema {
+    static var versionIdentifier: Schema.Version { .init(1, 0, 0) }
+    static var models: [any PersistentModel.Type] { [Person.self] }
+}
+
+enum RememberMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] { [RememberSchemaV1.self] }
+    static var stages: [MigrationStage] { [] }
+}
