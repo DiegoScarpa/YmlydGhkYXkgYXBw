@@ -114,6 +114,13 @@ enum RememberSchemaV1: VersionedSchema {
 }
 
 enum RememberMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [RememberSchemaV1.self] }
-    static var stages: [MigrationStage] { [] }
+    static var schemas: [any VersionedSchema.Type] { [RememberSchemaV1.self, RememberSchemaV2.self] }
+    static var stages: [MigrationStage] {
+        [.lightweight(fromVersion: RememberSchemaV1.self, toVersion: RememberSchemaV2.self)]
+    }
+}
+
+enum RememberSchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { .init(2, 0, 0) }
+    static var models: [any PersistentModel.Type] { [Person.self, ProfileExtras.self] }
 }

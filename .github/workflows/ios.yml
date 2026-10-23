@@ -13,5 +13,5 @@ jobs:
         run: swift test
       - name: Verify SwiftData survives reopening the store
         run: |
-          xcrun swiftc -parse-as-library Remember/Models/Person.swift scripts/verify-persistence.swift -o "$RUNNER_TEMP/verify-persistence"
+          xcrun swiftc -parse-as-library Remember/Models/Person.swift Remember/Models/ProfileExtras.swift scripts/verify-persistence.swift -o "$RUNNER_TEMP/verify-persistence"
           "$RUNNER_TEMP/verify-persistence" "$RUNNER_TEMP/RememberVerification.store"
