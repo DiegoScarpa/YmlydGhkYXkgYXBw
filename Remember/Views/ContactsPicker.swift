@@ -1,4 +1,5 @@
 import Contacts
+import ContactsUI
 import SwiftUI
 
 struct ContactsPicker: UIViewControllerRepresentable {
