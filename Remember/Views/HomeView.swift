@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     let people: [Person]
+    let extras: [ProfileExtras]
     @Binding var selection: AppTab
     let onAdd: () -> Void
     @State private var previewDate = Date.now
@@ -82,7 +83,7 @@ struct HomeView: View {
                         NavigationLink {
                             PersonDetailView(person: person)
                         } label: {
-                            BirthdayRow(person: person, referenceDate: .now)
+                            BirthdayRow(person: person, referenceDate: .now, photoData: extras.first { $0.personID == person.id }?.photoData)
                         }
                         .buttonStyle(.plain)
                         if person.id != people.last?.id { Divider().padding(.leading, 66) }

@@ -4,6 +4,16 @@ struct ReminderPerson {
     let id: UUID
     let name: String
     let birthday: BirthdayDate
+    let customOffsets: Set<Int>?
+    let giftIdeaCount: Int
+
+    init(id: UUID, name: String, birthday: BirthdayDate, customOffsets: Set<Int>? = nil, giftIdeaCount: Int = 0) {
+        self.id = id
+        self.name = name
+        self.birthday = birthday
+        self.customOffsets = customOffsets
+        self.giftIdeaCount = giftIdeaCount
+    }
 }
 
 struct PlannedReminder: Identifiable {
@@ -13,6 +23,7 @@ struct PlannedReminder: Identifiable {
     let birthday: Date
     let fireDate: Date
     let daysBefore: Int
+    let giftIdeaCount: Int
 
     var title: String {
         daysBefore == 0 ? "🎂 It's \(name)'s birthday!" : "🎂 \(name)'s birthday is coming up"
@@ -20,9 +31,11 @@ struct PlannedReminder: Identifiable {
 
     var body: String {
         switch daysBefore {
-        case 0: "Wish \(name) a happy birthday today."
-        case 1: "Tomorrow is \(name)'s birthday! Don't forget to reach out."
-        default: "\(name)'s birthday is in \(daysBefore) days."
+        case 0: return "Wish \(name) a happy birthday today."
+        case 1: return "Tomorrow is \(name)'s birthday! Don't forget to reach out."
+        default:
+            let gifts = giftIdeaCount > 0 ? " You saved \(giftIdeaCount) gift \(giftIdeaCount == 1 ? "idea" : "ideas")." : ""
+            return "\(name)'s birthday is in \(daysBefore) days.\(gifts)"
         }
     }
 }
@@ -53,7 +66,7 @@ enum ReminderPlanner {
                 ), let birthdayAtTime = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: birthday)
                 else { continue }
 
-                for offset in offsets where allowedOffsets.contains(offset) {
+                for offset in (person.customOffsets ?? offsets) where allowedOffsets.contains(offset) {
                     guard let fireDate = calendar.date(byAdding: .day, value: -offset, to: birthdayAtTime),
                           fireDate > now
                     else { continue }
@@ -63,7 +76,8 @@ enum ReminderPlanner {
                         name: person.name,
                         birthday: birthday,
                         fireDate: fireDate,
-                        daysBefore: offset
+                        daysBefore: offset,
+                        giftIdeaCount: person.giftIdeaCount
                     ))
                 }
             }

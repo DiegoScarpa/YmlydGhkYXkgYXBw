@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BirthdayCalendarView: View {
     let people: [Person]
+    let extras: [ProfileExtras]
     @State private var displayedMonth = Date.now
     @State private var selectedDate = Date.now
     @State private var showingYear = false
@@ -85,7 +86,7 @@ struct BirthdayCalendarView: View {
                         NavigationLink {
                             PersonDetailView(person: person)
                         } label: {
-                            BirthdayRow(person: person, referenceDate: selectedDate)
+                            BirthdayRow(person: person, referenceDate: selectedDate, photoData: extras.first { $0.personID == person.id }?.photoData)
                         }
                         .buttonStyle(.plain)
                         if person.id != selectedBirthdays.last?.id { Divider().padding(.leading, 66) }

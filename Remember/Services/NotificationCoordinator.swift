@@ -33,7 +33,7 @@ final class NotificationCoordinator {
     }
 
     /// Replaces only Remember's pending requests. IDs are stable, so edits cannot leave duplicates.
-    func refresh(people: [Person]) async throws {
+    func refresh(people: [Person], extras: [ProfileExtras] = []) async throws {
         let existing = await center.pendingNotificationRequests()
             .map(\.identifier)
             .filter { $0.hasPrefix("remember.") }
@@ -43,11 +43,21 @@ final class NotificationCoordinator {
         let status = await authorizationStatus()
         guard status == .authorized || status == .provisional else { return }
 
-        let records = people.map {
-            ReminderPerson(
-                id: $0.id,
-                name: $0.fullName,
-                birthday: BirthdayDate(month: $0.birthdayMonth, day: $0.birthdayDay, year: $0.birthYear)
+        let extrasByPerson = Dictionary(extras.map { ($0.personID, $0) }, uniquingKeysWith: { first, _ in first })
+        let records = people.filter { extrasByPerson[$0.id]?.remindersDisabled != true }.map { person in
+            let extra = extrasByPerson[person.id]
+            let customOffsets: Set<Int>?
+            if let raw = extra?.reminderOffsetsRaw, !raw.isEmpty {
+                customOffsets = Set(raw.split(separator: ",").compactMap { Int($0) })
+            } else {
+                customOffsets = nil
+            }
+            return ReminderPerson(
+                id: person.id,
+                name: person.fullName,
+                birthday: BirthdayDate(month: person.birthdayMonth, day: person.birthdayDay, year: person.birthYear),
+                customOffsets: customOffsets,
+                giftIdeaCount: extra?.giftItems.filter { $0.kind == .idea }.count ?? 0
             )
         }
         let reminders = ReminderPlanner.plan(

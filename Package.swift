@@ -9,7 +9,7 @@ let package = Package(
         .target(
             name: "RememberCore",
             path: "Remember/Services",
-            exclude: ["CommunicationLinks.swift", "NotificationCoordinator.swift"],
+            exclude: ["CommunicationLinks.swift", "NotificationCoordinator.swift", "ContactsImporter.swift", "ProfileExportDocument.swift"],
             sources: ["BirthdayCalculator.swift", "ReminderPlanner.swift"]
         ),
         .testTarget(name: "RememberCoreTests", dependencies: ["RememberCore"], path: "RememberTests")

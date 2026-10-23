@@ -59,4 +59,17 @@ final class BirthdayCalculatorTests: XCTestCase {
         XCTAssertTrue(plans.allSatisfy { $0.fireDate > date(2026, 10, 23) })
         XCTAssertTrue(plans.allSatisfy { $0.id.contains("2027") })
     }
+
+    func testPersonalOffsetsOverrideGlobalAndGiftIdeasAppearInBody() {
+        let person = ReminderPerson(
+            id: UUID(), name: "Michael", birthday: BirthdayDate(month: 11, day: 1, year: nil),
+            customOffsets: [7], giftIdeaCount: 3
+        )
+        let plans = ReminderPlanner.plan(
+            people: [person], offsets: [0, 1], hour: 9, minute: 0,
+            after: date(2026, 10, 23), calendar: calendar, maximum: 1
+        )
+        XCTAssertEqual(plans.map(\.daysBefore), [7])
+        XCTAssertTrue(plans[0].body.contains("3 gift ideas"))
+    }
 }

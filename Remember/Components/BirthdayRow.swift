@@ -3,10 +3,11 @@ import SwiftUI
 struct BirthdayRow: View {
     let person: Person
     let referenceDate: Date
+    var photoData: Data? = nil
 
     var body: some View {
         HStack(spacing: 14) {
-            PersonAvatar(person: person, size: 52)
+            PersonAvatar(person: person, size: 52, photoData: photoData)
             VStack(alignment: .leading, spacing: 4) {
                 Text(person.fullName).font(.headline)
                 Text(dateLabel).font(.subheadline).foregroundStyle(.secondary)

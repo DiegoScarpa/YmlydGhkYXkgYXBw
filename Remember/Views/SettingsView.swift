@@ -1,8 +1,13 @@
 import SwiftUI
 import UserNotifications
+import SwiftData
+import UniformTypeIdentifiers
+import Contacts
 
 struct SettingsView: View {
     let people: [Person]
+    let extras: [ProfileExtras]
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.openURL) private var openURL
     @AppStorage(ReminderPreferences.enabledKey) private var remindersEnabled = false
     @AppStorage(ReminderPreferences.offsetsKey) private var offsetsRaw = "0,7"
@@ -10,8 +15,12 @@ struct SettingsView: View {
     @AppStorage(ReminderPreferences.minuteKey) private var reminderMinute = 0
     @AppStorage("appearance") private var appearance = "system"
     @State private var authorizationStatus: UNAuthorizationStatus = .notDetermined
-    @State private var errorMessage = ""
-    @State private var showingError = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showingAlert = false
+    @State private var showingContactsPicker = false
+    @State private var exportDocument: ProfileExportDocument?
+    @State private var showingExporter = false
 
     var body: some View {
         NavigationStack {
@@ -41,12 +50,24 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("Privacy & Data") {
+                Section {
                     Label("Profiles stay on this iPhone", systemImage: "iphone.gen3")
                     Label("No account or tracking", systemImage: "hand.raised")
-                    Text("Contacts import and data export are planned for Phase 2.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    Button {
+                        showingContactsPicker = true
+                    } label: {
+                        Label("Import from Contacts", systemImage: "person.crop.circle.badge.plus")
+                    }
+                    Button {
+                        prepareExport()
+                    } label: {
+                        Label("Export All Data", systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(people.isEmpty)
+                } header: {
+                    Text("Privacy & Data")
+                } footer: {
+                    Text("Choose which contacts to import. Contacts without birthdays are skipped. Export creates a JSON file that may contain sensitive notes and photos.")
                 }
 
                 if authorizationStatus == .denied {
@@ -64,10 +85,24 @@ struct SettingsView: View {
             .onChange(of: offsetsRaw) { _, _ in refreshReminders() }
             .onChange(of: reminderHour) { _, _ in refreshReminders() }
             .onChange(of: reminderMinute) { _, _ in refreshReminders() }
-            .alert("Notification Error", isPresented: $showingError) {
+            .sheet(isPresented: $showingContactsPicker) {
+                ContactsPicker { selected in
+                    showingContactsPicker = false
+                    importContacts(selected)
+                }
+            }
+            .fileExporter(
+                isPresented: $showingExporter,
+                document: exportDocument,
+                contentType: .json,
+                defaultFilename: "Remember Export"
+            ) { result in
+                if case .failure(let error) = result { showAlert("Export Failed", error.localizedDescription) }
+            }
+            .alert(alertTitle, isPresented: $showingAlert) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text(errorMessage)
+                Text(alertMessage)
             }
         }
     }
@@ -125,25 +160,49 @@ struct SettingsView: View {
                 authorizationStatus = await NotificationCoordinator.shared.authorizationStatus()
                 if !allowed {
                     remindersEnabled = false
-                    errorMessage = "Allow notifications in iPhone Settings to receive birthday reminders."
-                    showingError = true
+                    showAlert("Notifications Off", "Allow notifications in iPhone Settings to receive birthday reminders.")
                     return
                 }
             }
-            try await NotificationCoordinator.shared.refresh(people: people)
+            try await NotificationCoordinator.shared.refresh(people: people, extras: extras)
         } catch {
-            errorMessage = error.localizedDescription
-            showingError = true
+            showAlert("Notification Error", error.localizedDescription)
         }
     }
 
     private func refreshReminders() {
         Task {
-            do { try await NotificationCoordinator.shared.refresh(people: people) }
+            do { try await NotificationCoordinator.shared.refresh(people: people, extras: extras) }
             catch {
-                errorMessage = error.localizedDescription
-                showingError = true
+                showAlert("Notification Error", error.localizedDescription)
             }
         }
+    }
+
+    private func importContacts(_ selected: [CNContact]) {
+        do {
+            let report = try ContactsImporter.importSelected(selected, into: modelContext)
+            showAlert("Contacts Imported", "Imported \(report.imported). Skipped \(report.skippedWithoutBirthday) without birthdays and \(report.skippedDuplicates) duplicates.")
+            let allPeople = try modelContext.fetch(FetchDescriptor<Person>())
+            let allExtras = try modelContext.fetch(FetchDescriptor<ProfileExtras>())
+            Task { try? await NotificationCoordinator.shared.refresh(people: allPeople, extras: allExtras) }
+        } catch {
+            showAlert("Import Failed", error.localizedDescription)
+        }
+    }
+
+    private func prepareExport() {
+        do {
+            exportDocument = try ProfileExportDocument(people: people, extras: extras)
+            showingExporter = true
+        } catch {
+            showAlert("Export Failed", error.localizedDescription)
+        }
+    }
+
+    private func showAlert(_ title: String, _ message: String) {
+        alertTitle = title
+        alertMessage = message
+        showingAlert = true
     }
 }

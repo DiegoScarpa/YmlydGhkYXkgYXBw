@@ -11,6 +11,7 @@ private enum PeopleSort: String, CaseIterable, Identifiable {
 
 struct PeopleView: View {
     let people: [Person]
+    let extras: [ProfileExtras]
     let onAdd: () -> Void
     @State private var searchText = ""
     @State private var sort: PeopleSort = .upcoming
@@ -27,7 +28,7 @@ struct PeopleView: View {
                         NavigationLink {
                             PersonDetailView(person: person)
                         } label: {
-                            BirthdayRow(person: person, referenceDate: .now)
+                            BirthdayRow(person: person, referenceDate: .now, photoData: extras.first { $0.personID == person.id }?.photoData)
                         }
                     }
                 }
