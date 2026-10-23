@@ -1,0 +1,13 @@
+name: iOS
+on:
+  push:
+  pull_request:
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iPhone simulator app
+        run: xcodebuild -project Remember.xcodeproj -scheme Remember -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build
+      - name: Test birthday and reminder logic
+        run: swift test
