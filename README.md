@@ -22,7 +22,7 @@ The dashboard, calendar, and reminder scheduler use the same `BirthdayCalculator
 4. Add a person on Home or People. Enter a name and birthday; the other details are optional.
 5. In Settings, enable birthday reminders and grant notification permission. Select offsets and a delivery time.
 
-For the core unit tests, run `swift test` on a Mac with Xcode installed. The CI workflow builds the simulator app and runs those tests. `scripts/verify-core.swift` is a lightweight assertion harness for environments with Swift but no XCTest.
+For the core unit tests, run `swift test` on a Mac with Xcode installed. The CI workflow builds the simulator app, runs those tests, and checks that a SwiftData profile survives reopening its store. `scripts/verify-core.swift` is a lightweight assertion harness for environments with Swift but no XCTest.
 
 ## Phase 1 behavior
 

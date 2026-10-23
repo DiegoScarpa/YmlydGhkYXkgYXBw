@@ -11,3 +11,7 @@ jobs:
         run: xcodebuild -project Remember.xcodeproj -scheme Remember -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO build
       - name: Test birthday and reminder logic
         run: swift test
+      - name: Verify SwiftData survives reopening the store
+        run: |
+          xcrun swiftc -parse-as-library Remember/Models/Person.swift scripts/verify-persistence.swift -o "$RUNNER_TEMP/verify-persistence"
+          "$RUNNER_TEMP/verify-persistence" "$RUNNER_TEMP/RememberVerification.store"
