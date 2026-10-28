@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Remember — Birthdays & People",
+  "short_name": "Remember",
+  "description": "Keep close to what matters. Remember birthdays and the details that matter to your people.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F2F2F7",
+  "theme_color": "#5C54BF",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

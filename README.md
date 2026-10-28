@@ -2,6 +2,8 @@
 
 Remember is a local-first iPhone app for birthdays and the details that help you stay close to people. The project uses SwiftUI, SwiftData, and UserNotifications, and targets iOS 17 or later.
 
+The installable Progressive Web App is in [`web/`](web/README.md). It runs without Xcode signing or an Apple Developer subscription. This README documents the original native app, which remains available alongside the PWA.
+
 ## Architecture
 
 | Folder | Responsibility |
